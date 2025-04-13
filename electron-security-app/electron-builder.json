@@ -1,0 +1,25 @@
+{
+  "appId": "com.example.electronsecurityapp",
+  "productName": "Electron Security App",
+  "version": "1.0.0",
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "directories": {
+    "output": "dist"
+  },
+  "mac": {
+    "category": "public.app-category.utilities"
+  },
+  "win": {
+    "target": [
+      "nsis"
+    ]
+  },
+  "linux": {
+    "target": [
+      "AppImage"
+    ]
+  }
+}
