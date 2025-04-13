@@ -1,0 +1,5 @@
+012c:err:environ:init_peb starting L"Z:\\home\\analyst\\samples\\EldenRingSaveCopy.exe" in experimental wow64 mode
+strace: WARNING: Proper structure decoding for this personality is not supported, please consider building strace with mpers support enabled.
+012c:err:virtual:map_file_into_view failed to set PROT_EXEC on file map, noexec filesystem?
+012c:err:virtual:virtual_map_section mapping 0x160000 99000 0 failed
+012c:err:mscoree:CLRRuntimeInfo_GetRuntimeHost Wine Mono is not installed
