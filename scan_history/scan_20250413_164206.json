@@ -1,0 +1,207 @@
+{
+  "scan_id": "scan_20250413_164206",
+  "timestamp": "20250413_164206",
+  "data": {
+    "confidence": 5.68,
+    "file": "trace.log",
+    "flag_summary": {
+      "missing_dll": 17,
+      "suspicious_execve": 1,
+      "unauthorized_file_access": 2
+    },
+    "flagged_percentage": 0.91,
+    "flags": [
+      {
+        "chunk": 1,
+        "description": "Execution of unexpected or sensitive binaries",
+        "details": "execve(\"/usr/bin/wine-preloader\"",
+        "is_common_benign": false,
+        "line": 20,
+        "rule": "suspicious_execve",
+        "weight": 0.8
+      },
+      {
+        "chunk": 1,
+        "description": "Access to sensitive system files",
+        "details": "open(\"/etc/passwd\"",
+        "is_common_benign": false,
+        "line": 16,
+        "rule": "unauthorized_file_access",
+        "weight": 0.9
+      },
+      {
+        "chunk": 1,
+        "description": "Access to sensitive system files",
+        "details": "open(\"/etc/passwd\"",
+        "is_common_benign": false,
+        "line": 39,
+        "rule": "unauthorized_file_access",
+        "weight": 0.9
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/syswow64/ntdll.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/syswow64/ntdll.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 69,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/syswow64/ntdll.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/syswow64/ntdll.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 72,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directo",
+        "is_common_benign": true,
+        "line": 126,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directo",
+        "is_common_benign": true,
+        "line": 130,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/syswow64/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/syswow64/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | EN",
+        "is_common_benign": true,
+        "line": 135,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/syswow64/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/syswow64/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | EN",
+        "is_common_benign": true,
+        "line": 138,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/system/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/system/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 143,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 150,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 152,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/z:/home/analyst/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/z:/home/analyst/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 157,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/z:/home/analyst/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/z:/home/analyst/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 160,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/syswow64/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/syswow64/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | EN",
+        "is_common_benign": true,
+        "line": 165,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/syswow64/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/syswow64/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | EN",
+        "is_common_benign": true,
+        "line": 168,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 173,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 175,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/syswow64/wbem/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/syswow64/wbem/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or direc",
+        "is_common_benign": true,
+        "line": 180,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/syswow64/WindowsPowershell/v1.0/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/c:/windows/syswow64/WindowsPowershell/v1.0/kernel32.dll\", 0x7ffffe0f | ",
+        "is_common_benign": true,
+        "line": 188,
+        "rule": "missing_dll",
+        "weight": 0.4
+      }
+    ],
+    "high_confidence": false,
+    "is_suspicious": false,
+    "recommendations": [
+      "Monitor for additional suspicious activity, but no immediate action required."
+    ],
+    "thresholds": {
+      "high_confidence": 10,
+      "suspicious": 5
+    },
+    "total_lines": 2198
+  },
+  "report_path": "stored_reports\\log_analysis_report_1744542726.pdf"
+}

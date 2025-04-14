@@ -1,1 +1,1 @@
-/home/analyst/samples/EldenRingSaveCopy.exe: PE32 executable (GUI) Intel 80386 Mono/.Net assembly, for MS Windows, 3 sections
+/home/analyst/samples/6.exe: PE32 executable (GUI) Intel 80386, for MS Windows, 5 sections

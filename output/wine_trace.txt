@@ -1,5 +1,12 @@
-012c:err:environ:init_peb starting L"Z:\\home\\analyst\\samples\\EldenRingSaveCopy.exe" in experimental wow64 mode
+0160:err:environ:init_peb starting L"Z:\\home\\analyst\\samples\\6.exe" in experimental wow64 mode
 strace: WARNING: Proper structure decoding for this personality is not supported, please consider building strace with mpers support enabled.
-012c:err:virtual:map_file_into_view failed to set PROT_EXEC on file map, noexec filesystem?
-012c:err:virtual:virtual_map_section mapping 0x160000 99000 0 failed
-012c:err:mscoree:CLRRuntimeInfo_GetRuntimeHost Wine Mono is not installed
+0160:err:virtual:map_file_into_view failed to set PROT_EXEC on file map, noexec filesystem?
+0160:err:virtual:virtual_map_section mapping 0x160000 99000 0 failed
+0174:err:winediag:nodrv_CreateWindow Application tried to create a window, but no driver could be loaded.
+0174:err:winediag:nodrv_CreateWindow L"The explorer process failed to start."
+0174:err:systray:initialize_systray Could not create tray window
+0174:err:ole:start_rpcss Failed to start RpcSs service
+wine: Unhandled page fault on execute access to 00619000 at address 00619000 (thread 0160), starting debugger...
+0160:err:seh:start_debugger Couldn't start debugger L"winedbg --auto 348 184" (1359)
+Read the Wine Developers Guide on how to set up winedbg or another debugger
+0174:err:ole:start_rpcss Failed to start RpcSs service

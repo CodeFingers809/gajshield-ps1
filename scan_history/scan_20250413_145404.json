@@ -1,0 +1,126 @@
+{
+  "scan_id": "scan_20250413_145404",
+  "timestamp": "20250413_145404",
+  "data": {
+    "confidence": 0.15,
+    "file": "trace.log",
+    "flag_summary": {
+      "missing_dll": 8,
+      "suspicious_execve": 1,
+      "unauthorized_file_access": 2
+    },
+    "flagged_percentage": 0.33,
+    "flags": [
+      {
+        "chunk": 1,
+        "description": "Execution of unexpected or sensitive binaries",
+        "details": "execve(\"/usr/bin/wine-preloader\"",
+        "is_common_benign": false,
+        "line": 20,
+        "rule": "suspicious_execve",
+        "weight": 0.8
+      },
+      {
+        "chunk": 1,
+        "description": "Access to sensitive system files",
+        "details": "open(\"/etc/passwd\"",
+        "is_common_benign": false,
+        "line": 16,
+        "rule": "unauthorized_file_access",
+        "weight": 0.9
+      },
+      {
+        "chunk": 1,
+        "description": "Access to sensitive system files",
+        "details": "open(\"/etc/passwd\"",
+        "is_common_benign": false,
+        "line": 39,
+        "rule": "unauthorized_file_access",
+        "weight": 0.9
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directo",
+        "is_common_benign": true,
+        "line": 155,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernel32.dll\", | \"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernel32.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directo",
+        "is_common_benign": true,
+        "line": 159,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernelbase.dll\", | \"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernelbase.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or dir",
+        "is_common_benign": true,
+        "line": 202,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernelbase.dll\", | \"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/kernelbase.dll\", 0x7ffffe0feed0 | -1 ENOENT (No such file or dir",
+        "is_common_benign": true,
+        "line": 206,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/MSVCRT.DLL\", | \"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/MSVCRT.DLL\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) ",
+        "is_common_benign": true,
+        "line": 306,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/MSVCRT.DLL\", | \"/home/analyst/.wine/dosdevices/z:/home/analyst/samples/MSVCRT.DLL\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) ",
+        "is_common_benign": true,
+        "line": 310,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/syswow64/MSVCRT.DLL\", | \"/home/analyst/.wine/dosdevices/c:/windows/syswow64/MSVCRT.DLL\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 315,
+        "rule": "missing_dll",
+        "weight": 0.4
+      },
+      {
+        "chunk": 3,
+        "description": "Attempt to load missing DLLs, common in malware but also installers",
+        "details": "stat(\"/home/analyst/.wine/dosdevices/c:/windows/syswow64/MSVCRT.DLL\", | \"/home/analyst/.wine/dosdevices/c:/windows/syswow64/MSVCRT.DLL\", 0x7ffffe0feed0 | -1 ENOENT (No such file or directory) | ENOENT",
+        "is_common_benign": true,
+        "line": 318,
+        "rule": "missing_dll",
+        "weight": 0.4
+      }
+    ],
+    "high_confidence": false,
+    "is_suspicious": false,
+    "recommendations": [
+      "Monitor for additional suspicious activity, but no immediate action required."
+    ],
+    "thresholds": {
+      "high_confidence": 10,
+      "suspicious": 5
+    },
+    "total_lines": 3315
+  },
+  "report_path": "stored_reports\\log_analysis_report_1744536244.pdf"
+}

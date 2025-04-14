@@ -12,50 +12,30 @@ function History() {
 
   const handleDownloadReport = async (scan) => {
     try {
-      if (scan.reportPath) {
-        // Download stored report using the stored path
-        const response = await fetch(`http://localhost:5000/api/reports/${scan.reportPath}`);
-        if (!response.ok) throw new Error('Failed to download report');
-        
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = scan.reportPath;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      } else {
-        // Generate new report if no stored path exists
-        const response = await fetch('http://localhost:5000/api/download-report', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(scan.results)
-        });
+      const endpoint = scan.type === 'log_analysis' ? 
+        'download-log-report' : 'download-report';
 
-        if (!response.ok) throw new Error('Failed to generate report');
+      const response = await fetch(`http://localhost:5000/api/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(scan.results)
+      });
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `security_report_${scan.timestamp}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+      if (!response.ok) throw new Error('Failed to generate report');
 
-        // Update stored path in history
-        const scanHistory = JSON.parse(localStorage.getItem('scanHistory'));
-        const scanIndex = scanHistory.findIndex(s => s.timestamp === scan.timestamp);
-        if (scanIndex !== -1) {
-          scanHistory[scanIndex].reportPath = `security_report_${scan.timestamp}.pdf`;
-          localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
-        }
-      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = scan.type === 'log_analysis' ? 
+        `log_analysis_${scan.timestamp}.pdf` :
+        `security_report_${scan.timestamp}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (error) {
-      console.error('Download error:', error);  // Log error but don't show to user
+      console.error('Download error:', error);
     }
   };
 
@@ -105,6 +85,7 @@ function History() {
           <TableHead>
             <TableRow>
               <TableCell>File Name</TableCell>
+              <TableCell>Type</TableCell>
               <TableCell>Scan Date</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Threat Level</TableCell>
@@ -115,6 +96,9 @@ function History() {
             {scanHistory.map((scan, index) => (
               <TableRow key={index}>
                 <TableCell>{scan.fileName}</TableCell>
+                <TableCell>
+                  {scan.type === 'log_analysis' ? 'Log Analysis' : 'Security Scan'}
+                </TableCell>
                 <TableCell>{new Date(scan.timestamp).toLocaleString()}</TableCell>
                 <TableCell>{scan.status}</TableCell>
                 <TableCell>{getThreatLevelChip(scan.threatLevel)}</TableCell>

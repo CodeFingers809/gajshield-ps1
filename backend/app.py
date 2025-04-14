@@ -6,7 +6,7 @@ from scripts.static3 import StaticAnalyzer as AdvancedAnalyzer
 from scripts.static4 import StaticAnalyzer as CompleteAnalyzer
 from byteconvert import file_to_bytes
 import os
-from report_generator import generate_report
+from report_generator import generate_report, generate_log_report
 import tempfile
 import time
 from groq import Groq
@@ -14,6 +14,9 @@ from datetime import datetime
 from scripts.malware_classifier import classify_bytes_file
 import numpy as np
 from scripts.sys_log_analysis import process_log_file
+import subprocess
+import shutil
+import json
 
 # Increase timeout and enable debug logging
 app = Flask(__name__)
@@ -30,6 +33,18 @@ groq_client = Groq(api_key="gsk_UWedOrEveeB7Ne6N00l3WGdyb3FYiBWNalb6BE4s232SjtXu
 REQUIRED_DIRS = ['temp_uploads', 'temp_bytes', 'temp_reports', 'stored_reports']
 for dir_name in REQUIRED_DIRS:
     os.makedirs(dir_name, exist_ok=True)
+
+# Add new config for sample and output directories
+SAMPLE_DIR = os.path.join(os.path.dirname(__file__), '..', 'samples')
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'output')
+
+# Ensure directories exist
+os.makedirs(SAMPLE_DIR, exist_ok=True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+# Add new directory for scan history
+SCAN_HISTORY_DIR = os.path.join(os.path.dirname(__file__), '..', 'scan_history')
+os.makedirs(SCAN_HISTORY_DIR, exist_ok=True)
 
 def process_file(file_obj, analyzer_class):
     """Process file with byte conversion and analysis"""
@@ -94,6 +109,25 @@ def store_report(report_data, filename):
     stored_path = os.path.join('stored_reports', filename)
     generate_report(report_data, stored_path)
     return stored_path
+
+def store_scan_history(scan_data, report_path):
+    """Store scan results and report in history"""
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    scan_id = f"scan_{timestamp}"
+    
+    history_entry = {
+        'scan_id': scan_id,
+        'timestamp': timestamp,
+        'data': scan_data,
+        'report_path': report_path
+    }
+    
+    # Save to JSON file
+    history_file = os.path.join(SCAN_HISTORY_DIR, f"{scan_id}.json")
+    with open(history_file, 'w') as f:
+        json.dump(history_entry, f, indent=2)
+    
+    return scan_id
 
 @app.route('/api/reports/<filename>', methods=['GET'])
 def get_stored_report(filename):
@@ -258,37 +292,168 @@ def classify_malware():
 
 @app.route('/api/analyze-logs', methods=['POST'])
 def analyze_logs():
-    """Endpoint for analyzing log files"""
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file provided'}), 400
-
-    file = request.files['file']
-    temp_path = None
+    """Analyze generated trace.log file"""
     try:
-        # Save log file temporarily
-        temp_path = os.path.join('temp_uploads', file.filename)
-        os.makedirs('temp_uploads', exist_ok=True)  # Ensure directory exists
-        file.save(temp_path)
+        data = request.json
+        filename = data.get('filename', 'trace.log')
         
-        print(f"Processing log file: {temp_path}")  # Debug print
-        results = process_log_file(temp_path)
-        print(f"Analysis results: {results}")  # Debug print
-        
+        # Get path to trace.log
+        log_path = os.path.join(OUTPUT_DIR, filename)
+        if not os.path.exists(log_path):
+            return jsonify({'error': 'Log file not found'}), 404
+
+        # Process the log file
+        results = process_log_file(log_path)
         if not results:
             return jsonify({'error': 'Failed to process log file'}), 500
 
         return jsonify(results)
 
     except Exception as e:
-        print(f"Log analysis error: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-    finally:
-        if temp_path and os.path.exists(temp_path):
-            try:
-                os.remove(temp_path)
-            except Exception as e:
-                print(f"Failed to remove temp file: {e}")
+@app.route('/api/upload-sample', methods=['POST'])
+def upload_sample():
+    """Handle file upload to samples directory"""
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+
+    file = request.files['file']
+    try:
+        # Save file to samples directory
+        filepath = os.path.join(SAMPLE_DIR, file.filename)
+        file.save(filepath)
+        return jsonify({'message': 'File uploaded successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/run-analysis', methods=['POST'])
+def run_analysis():
+    """Execute Docker analysis command"""
+    try:
+        data = request.json
+        filename = data.get('filename')
+        if not filename:
+            return jsonify({'error': 'Filename not provided'}), 400
+
+        # First try to remove any existing container with the same name
+        try:
+            subprocess.run(['docker', 'rm', '-f', 'malware-analysis'], 
+                         capture_output=True, 
+                         check=False)  # Don't raise error if container doesn't exist
+        except Exception as e:
+            print(f"Warning: Failed to remove existing container: {e}")
+
+        # Create named pipe for input
+        print(f"Starting analysis for {filename}")
+        
+        # Docker command without -it flags
+        docker_cmd = [
+            'docker', 'run',
+            '--rm',  # Remove container after execution
+            '--name', 'malware-analysis',
+            '--security-opt', 'no-new-privileges=true',
+            '--cap-drop=ALL',
+            '--cap-add=SYS_PTRACE',
+            '--memory=512m',
+            '--memory-swap=512m',
+            '--cpus=1',
+            '--pids-limit=100',
+            '--ulimit', 'nofile=1024:1024',
+            '--ulimit', 'nproc=100:100',
+            '--network=none',
+            '--read-only',
+            '--tmpfs', '/tmp:size=100m,mode=1777',
+            '--tmpfs', '/home/analyst/.wine:size=500m,mode=0700,uid=1000,gid=1000',
+            '-v', f'{os.path.abspath(SAMPLE_DIR)}:/home/analyst/samples:ro',
+            '-v', f'{os.path.abspath(OUTPUT_DIR)}:/home/analyst/output:rw',
+            'malware-analysis:1.1',
+            'bash', '-c', f'echo "{filename}" | /usr/local/bin/auto_analyze.sh'
+        ]
+
+        # Execute Docker command
+        print("Executing Docker command:", ' '.join(docker_cmd))
+        process = subprocess.run(
+            docker_cmd,
+            capture_output=True,
+            text=True,
+            check=False  # Don't raise error on non-zero exit
+        )
+
+        print("Docker stdout:", process.stdout)
+        print("Docker stderr:", process.stderr)
+
+        if process.returncode != 0:
+            return jsonify({
+                'error': 'Docker analysis failed',
+                'details': process.stderr,
+                'stdout': process.stdout
+            }), 500
+
+        # Check if trace.log was generated
+        trace_log_path = os.path.join(OUTPUT_DIR, 'trace.log')
+        if not os.path.exists(trace_log_path):
+            return jsonify({
+                'error': 'Trace log not generated',
+                'details': 'Analysis completed but no trace log was produced'
+            }), 500
+
+        return jsonify({
+            'message': 'Analysis completed successfully',
+            'details': process.stdout
+        })
+
+    except Exception as e:
+        print(f"Analysis error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/download-log-report', methods=['POST'])
+def download_log_report():
+    """Generate and download log analysis report"""
+    data = request.json
+    if not data:
+        return jsonify({'error': 'No analysis data provided'}), 400
+
+    try:
+        # Create temp directory for reports if it doesn't exist
+        os.makedirs('temp_reports', exist_ok=True)
+
+        # Generate unique filename
+        timestamp = int(time.time())
+        filename = f'log_analysis_report_{timestamp}.pdf'
+        report_path = os.path.join('stored_reports', filename)  # Changed to stored_reports
+
+        # Generate log report
+        generate_log_report(data, report_path)
+
+        # Store in scan history
+        scan_id = store_scan_history(data, report_path)
+
+        # Send file
+        response = send_file(
+            report_path,
+            mimetype='application/pdf',
+            as_attachment=True,
+            download_name=filename
+        )
+
+        return response
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/scan-history', methods=['GET'])
+def get_scan_history():
+    """Retrieve scan history"""
+    try:
+        history = []
+        for file in os.listdir(SCAN_HISTORY_DIR):
+            if file.endswith('.json'):
+                with open(os.path.join(SCAN_HISTORY_DIR, file)) as f:
+                    history.append(json.load(f))
+        return jsonify(sorted(history, key=lambda x: x['timestamp'], reverse=True))
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # Make sure Flask server accepts connections from any host
 if __name__ == '__main__':

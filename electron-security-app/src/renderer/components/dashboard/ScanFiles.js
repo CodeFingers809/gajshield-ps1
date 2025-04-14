@@ -1,13 +1,13 @@
 import React from 'react';
 import { 
-  Box, Typography, Paper, Button, Grid, LinearProgress, Alert, 
+  Box, Typography, Paper, Button, Grid, LinearProgress, 
   Tabs, Tab, Card, CardContent, CardHeader, 
   Table, TableBody, TableCell, TableContainer, TableRow, TableHead,
   Chip, Stack, CircularProgress, IconButton, Tooltip, Divider, List, ListItem, ListItemText
 } from '@mui/material';
 import { 
   CloudUpload, Security, Download, Refresh, CheckCircle,
-  Warning, Error as ErrorIcon, Info 
+  Info, Warning
 } from '@mui/icons-material';
 
 function JsonDataView({ title, data = {}, type, compareTo }) {
@@ -45,7 +45,7 @@ function JsonDataView({ title, data = {}, type, compareTo }) {
       return value ? (
         <Chip icon={<CheckCircle />} label="Yes" color="success" size="small" />
       ) : (
-        <Chip icon={<Warning />} label="No" color="error" size="small" />
+        <Chip icon={<Info />} label="No" color="info" size="small" />
       );
     }
     
@@ -536,8 +536,6 @@ function ScanFiles() {
     if (!data) return null;
 
     const getSeverityIcon = () => {
-      // if (data.error) return <ErrorIcon color="error" />;
-      if (type !== 'enhanced' && data.suspicious) return <Warning color="warning" />;
       return <CheckCircle color="success" />;
     };
 
@@ -685,11 +683,6 @@ function ScanFiles() {
         </Paper>
       )}
 
-      {error && (
-        // <Alert severity="error" sx={{ my: 2 }}>{error}</Alert>
-        <></>
-      )}
-
       {Object.keys(results || {}).length > 0 && (
         <Paper 
           elevation={3} 
@@ -742,8 +735,6 @@ function ScanFiles() {
                   <Tab 
                     key={type}
                     label={type.toUpperCase()}
-                    icon={fileResults[type]?.error ? <Warning color="error" /> : null}
-                    iconPosition="end"
                   />
                 ))}
                 <Tab label="Malware Classification" />

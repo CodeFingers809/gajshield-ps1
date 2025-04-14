@@ -6,7 +6,7 @@ import {
   Chip
 } from '@mui/material';
 import { 
-  CloudUpload, Warning, CheckCircle, Error as ErrorIcon, Info
+  CloudUpload, Warning, Error as ErrorIcon, Info, CloudDownload
 } from '@mui/icons-material';
 
 function LogAnalysis() {
@@ -18,37 +18,90 @@ function LogAnalysis() {
     setAnalyzing(true);
     setError(null);
     
+    const file = files[0];
     const formData = new FormData();
-    formData.append('file', files[0]);
+    formData.append('file', file);
 
     try {
-      console.log('Sending request to analyze logs...');  // Debug log
-      const response = await fetch('http://localhost:5000/api/analyze-logs', {
+      const uploadResponse = await fetch('http://localhost:5000/api/upload-sample', {
         method: 'POST',
         body: formData,
-        headers: {
-          'Accept': 'application/json',
-        },
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Analysis failed: ${errorText}`);
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to upload file');
       }
 
-      const data = await response.json();
-      console.log('Analysis response:', data);  // Debug log
+      const dockerResponse = await fetch('http://localhost:5000/api/run-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filename: file.name
+        }),
+      });
 
+      if (!dockerResponse.ok) {
+        throw new Error('Docker analysis failed');
+      }
+
+      const analysisResponse = await fetch('http://localhost:5000/api/analyze-logs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filename: 'trace.log'
+        }),
+      });
+
+      if (!analysisResponse.ok) {
+        throw new Error('Log analysis failed');
+      }
+
+      const data = await analysisResponse.json();
       if (data.error) {
         throw new Error(data.error);
       }
       
       setResults(data);
+
     } catch (err) {
-      console.error('Log analysis error:', err);
-      setError(err.message || 'Failed to connect to analysis server');
+      console.error('Analysis error:', err);
+      setError(err.message || 'Failed to complete analysis');
     } finally {
       setAnalyzing(false);
+    }
+  };
+
+  const handleDownloadReport = async () => {
+    if (!results) return;
+
+    try {
+      const response = await fetch('http://localhost:5000/api/download-log-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(results)
+      });
+
+      if (!response.ok) throw new Error('Failed to generate report');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `log_analysis_report_${new Date().getTime()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+    } catch (err) {
+      console.error('Download error:', err);
+      setError('Failed to download report');
     }
   };
 
@@ -59,12 +112,21 @@ function LogAnalysis() {
       <Card sx={{ mt: 3 }}>
         <CardContent>
           <Stack spacing={3}>
-            {/* File Info Section */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleDownloadReport}
+                startIcon={<CloudDownload />}
+              >
+                Download Report
+              </Button>
+            </Box>
             <Box>
               <Typography variant="subtitle2" gutterBottom>File Information:</Typography>
               <Box sx={{ 
                 display: 'flex', 
-                flexWrap: 'wrap', // Enable wrapping for chips
+                flexWrap: 'wrap', 
                 gap: 1 
               }}>
                 <Chip 
@@ -86,7 +148,6 @@ function LogAnalysis() {
               </Box>
             </Box>
 
-            {/* Detection Summary */}
             {results.flag_summary && Object.keys(results.flag_summary).length > 0 && (
               <Box>
                 <Typography variant="subtitle2" gutterBottom>Detection Summary:</Typography>
@@ -121,7 +182,6 @@ function LogAnalysis() {
               </Box>
             )}
 
-            {/* Recommendations */}
             {results.recommendations && (
               <Box>
                 <Typography variant="subtitle2" gutterBottom>Recommendations:</Typography>
@@ -144,7 +204,6 @@ function LogAnalysis() {
               </Box>
             )}
 
-            {/* Flags */}
             {results.flags && results.flags.length > 0 && (
               <Box>
                 <Typography variant="subtitle2" gutterBottom>Detected Issues:</Typography>
@@ -182,7 +241,6 @@ function LogAnalysis() {
               </Box>
             )}
 
-            {/* Confidence Score */}
             <Box sx={{ mt: 2 }}>
               <Typography variant="subtitle2" gutterBottom>Analysis Results:</Typography>
               <Card sx={{ p: 2, bgcolor: 'background.neutral' }}>
@@ -276,14 +334,14 @@ function LogAnalysis() {
           type="file"
           hidden
           onChange={(e) => handleFileUpload(e.target.files)}
-          accept=".log,.txt"
+          accept=".exe,.dll"
         />
         <CloudUpload sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
         <Typography variant="h6" color="primary.main" gutterBottom>
-          Drop log file here or click to browse
+          Drop executable file here or click to browse
         </Typography>
         <Typography color="text.secondary" variant="body2">
-          Supports .log and .txt files
+          Supports .exe and .dll files
         </Typography>
       </Box>
 
